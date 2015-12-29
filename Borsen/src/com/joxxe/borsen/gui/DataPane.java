@@ -3,9 +3,11 @@ package com.joxxe.borsen.gui;
 
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+
+import com.joxxe.borsen.model.QuoteData;
+
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
-import model.QuoteData;
 
 public class DataPane extends Pane {
 	private Label valueName;

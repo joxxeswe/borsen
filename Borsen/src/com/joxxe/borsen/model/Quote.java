@@ -1,4 +1,4 @@
-package model;
+package com.joxxe.borsen.model;
 
 import java.io.Externalizable;
 import java.io.IOException;

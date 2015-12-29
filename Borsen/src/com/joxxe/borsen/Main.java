@@ -6,6 +6,7 @@ import com.joxxe.borsen.gui.MenuBorsen;
 import com.joxxe.borsen.gui.tabs.Tab0;
 import com.joxxe.borsen.gui.tabs.Tab1;
 import com.joxxe.borsen.gui.tabs.Tab2;
+import com.joxxe.borsen.model.MarketCrawler;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -15,7 +16,6 @@ import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import model.MarketCrawler;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;

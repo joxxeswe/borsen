@@ -1,6 +1,9 @@
 package com.joxxe.borsen.gui.tabs;
 
 import com.joxxe.borsen.Main;
+import com.joxxe.borsen.model.MarketCrawler;
+import com.joxxe.borsen.model.Quote;
+import com.joxxe.borsen.model.QuoteDay;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,9 +13,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import model.MarketCrawler;
-import model.Quote;
-import model.QuoteDay;
 
 public class Tab1 extends Tab {
 

@@ -2,6 +2,8 @@ package com.joxxe.borsen.gui.tabs;
 
 import com.joxxe.borsen.Main;
 import com.joxxe.borsen.gui.DataPane;
+import com.joxxe.borsen.model.MarketCrawler;
+import com.joxxe.borsen.model.Quote;
 
 import javafx.event.EventHandler;
 import javafx.scene.chart.CategoryAxis;
@@ -13,8 +15,6 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import model.MarketCrawler;
-import model.Quote;
 
 public class Tab2 extends Tab {
 

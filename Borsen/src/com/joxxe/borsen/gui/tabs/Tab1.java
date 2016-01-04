@@ -2,8 +2,8 @@ package com.joxxe.borsen.gui.tabs;
 
 import com.joxxe.borsen.Main;
 import com.joxxe.borsen.model.MarketCrawler;
-import com.joxxe.borsen.model.Quote;
-import com.joxxe.borsen.model.QuoteDay;
+import com.joxxe.borsen.model.stock.Stock;
+import com.joxxe.borsen.model.stock.StockDayValue;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,7 +17,7 @@ import javafx.scene.layout.HBox;
 public class Tab1 extends Tab {
 
 	private MarketCrawler marketCrawler;
-	private TableView<QuoteDay> table;
+	private TableView<StockDayValue> table;
 	private ListView<String> list;
 
 	@SuppressWarnings("unchecked")
@@ -28,19 +28,19 @@ public class Tab1 extends Tab {
 		HBox box = new HBox();
 
 		//table
-		table = new TableView<QuoteDay>();
-		TableColumn<QuoteDay, String> dateCol = new TableColumn<QuoteDay, String>("Datum");
-		dateCol.setCellValueFactory(new PropertyValueFactory<QuoteDay, String>("date"));
-		TableColumn<QuoteDay, Double> openCol = new TableColumn<QuoteDay, Double>("Öppning");
-		openCol.setCellValueFactory(new PropertyValueFactory<QuoteDay, Double>("open"));
-		TableColumn<QuoteDay, Double> closeCol = new TableColumn<QuoteDay, Double>("Stägning");
-		closeCol.setCellValueFactory(new PropertyValueFactory<QuoteDay, Double>("close"));
-		TableColumn<QuoteDay, Double> highCol = new TableColumn<QuoteDay, Double>("Högsta");
-		highCol.setCellValueFactory(new PropertyValueFactory<QuoteDay, Double>("high"));
-		TableColumn<QuoteDay, Double> lowCol = new TableColumn<QuoteDay, Double>("Lägsta");
-		lowCol.setCellValueFactory(new PropertyValueFactory<QuoteDay, Double>("low"));
-		TableColumn<QuoteDay, Double> volCol = new TableColumn<QuoteDay, Double>("Volym");
-		volCol.setCellValueFactory(new PropertyValueFactory<QuoteDay, Double>("volume"));
+		table = new TableView<StockDayValue>();
+		TableColumn<StockDayValue, String> dateCol = new TableColumn<StockDayValue, String>("Datum");
+		dateCol.setCellValueFactory(new PropertyValueFactory<StockDayValue, String>("date"));
+		TableColumn<StockDayValue, Double> openCol = new TableColumn<StockDayValue, Double>("Öppning");
+		openCol.setCellValueFactory(new PropertyValueFactory<StockDayValue, Double>("open"));
+		TableColumn<StockDayValue, Double> closeCol = new TableColumn<StockDayValue, Double>("Stägning");
+		closeCol.setCellValueFactory(new PropertyValueFactory<StockDayValue, Double>("close"));
+		TableColumn<StockDayValue, Double> highCol = new TableColumn<StockDayValue, Double>("Högsta");
+		highCol.setCellValueFactory(new PropertyValueFactory<StockDayValue, Double>("high"));
+		TableColumn<StockDayValue, Double> lowCol = new TableColumn<StockDayValue, Double>("Lägsta");
+		lowCol.setCellValueFactory(new PropertyValueFactory<StockDayValue, Double>("low"));
+		TableColumn<StockDayValue, Double> volCol = new TableColumn<StockDayValue, Double>("Volym");
+		volCol.setCellValueFactory(new PropertyValueFactory<StockDayValue, Double>("volume"));
 		table.getColumns().addAll(dateCol, openCol, closeCol, highCol, lowCol, volCol);
 		updateTableData();
 		table.setPrefWidth(m.root.getWidth() - Main.LIST_WIDTH);
@@ -52,17 +52,19 @@ public class Tab1 extends Tab {
 	public void updateTableData() {
 		String selected = list.getSelectionModel().getSelectedItem();
 		if (selected != null) {
-			Quote qd = marketCrawler.getQuoteAsString(selected);
+			Stock qd = marketCrawler.getQuoteAsString(selected);
 			if (qd != null) {
-				ObservableList<QuoteDay> qds = FXCollections.observableArrayList(qd.getQuoteDays());
+				ObservableList<StockDayValue> qds = FXCollections.observableArrayList(qd.getQuoteDays());
 				table.setItems(qds);
 				table.getColumns().get(0).setVisible(false);
 				table.getColumns().get(0).setVisible(true);
+			}else{
+				table.setItems(null);
 			}
 		}
 	}
 	
-	public TableView<QuoteDay> getTable(){
+	public TableView<StockDayValue> getTable(){
 		return table;
 	}
 }

@@ -1,4 +1,4 @@
-package com.joxxe.borsen.model;
+package com.joxxe.borsen.model.stock;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.util.Date;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
-public class QuoteDay implements Externalizable {
+public class StockDayValue implements Externalizable {
 
 	/**
 	 * 
@@ -24,7 +24,7 @@ public class QuoteDay implements Externalizable {
 	private SimpleDoubleProperty low;
 	private SimpleDoubleProperty high;
 	
-	public QuoteDay(Date date,SimpleDoubleProperty adjClose,SimpleDoubleProperty close, SimpleDoubleProperty high,SimpleDoubleProperty low,SimpleDoubleProperty open,SimpleDoubleProperty volume){
+	public StockDayValue(Date date,SimpleDoubleProperty adjClose,SimpleDoubleProperty close, SimpleDoubleProperty high,SimpleDoubleProperty low,SimpleDoubleProperty open,SimpleDoubleProperty volume){
 		setDate(date);
 		setAdjClose(adjClose);
 		setClose(close);
@@ -34,13 +34,13 @@ public class QuoteDay implements Externalizable {
 		setVolume(volume);
 	}
 	
-	public QuoteDay(){
+	public StockDayValue(){
 		
 	}
 
    
 	
-	public QuoteDay(Date date2, double adjClose2, double close2, double high2, double low2, double open2,
+	public StockDayValue(Date date2, double adjClose2, double close2, double high2, double low2, double open2,
 			double volume2) {
 		setDate(date2);
 		setAdjClose(new SimpleDoubleProperty(adjClose2));
@@ -53,8 +53,8 @@ public class QuoteDay implements Externalizable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof QuoteDay) {
-			return ((QuoteDay)obj).getDate().equals(this.getDate());
+		if (obj instanceof StockDayValue) {
+			return ((StockDayValue)obj).getDate().equals(this.getDate());
 		}
 		return false;
 	}

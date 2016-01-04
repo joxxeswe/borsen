@@ -26,39 +26,80 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.joxxe.borsen.Main;
+import com.joxxe.borsen.model.stock.Stock;
+import com.joxxe.borsen.model.stock.StockData;
+import com.joxxe.borsen.model.stock.StockDayValue;
+import com.joxxe.borsen.model.stock.StockResultSet;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class MarketCrawler {
 
 	private static String URL = "https://query.yahooapis.com/v1/public/yql?q=FRÅGA&format=json&diagnostics=true&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=";
 	private String urlForHistoricalData;
 	private String queryForHistoricalData;
-	private ArrayList<String> companies;
-	private ArrayList<Quote> quotes = new ArrayList<Quote>();
-	private String queryForQuoteData;
-	private String urlForQuoteData;
+	private ArrayList<Stock> stocks = new ArrayList<Stock>();
+	private String queryForStockData;
+	private String urlForStockData;
+	
+	private ObservableList<String> companies;
 
-	public MarketCrawler(ArrayList<String> c) {
+	public MarketCrawler(ObservableList<String> c) {
 		this.companies = c;
-		this.queryForQuoteData = "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20("
-				+ getStringForCompanies(companies) + ")";
-		urlForQuoteData = URL.replace("FRÅGA", queryForQuoteData);
+		rebuildDataQuery();
 	}
 
-	public Quote getQuote(int index) {
-		if (quotes != null && quotes.size() > index) {
-			return quotes.get(index);
+	private void rebuildDataQuery() {
+		this.queryForStockData = "select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20("
+				+ getStringForCompanies(companies) + ")";
+		urlForStockData = URL.replace("FRÅGA", queryForStockData);
+	}
+	
+	public void removeCompany(String c){
+		if(companies.contains(c)){
+			companies.remove(c);
+			removeStockByName(c);
+			rebuildDataQuery();
+			Main.output("Lyckades ta bort " + c);
+		}else{
+			Main.output("Kunde ej ta bort " + c + " (fanns ej i listan?)");
+		}
+	}
+	
+	public void addCompany(String c){
+		companies.add(c);
+		rebuildDataQuery();
+	}
+
+	private boolean removeStockByName(String n){
+		Stock stock = null;
+		for (Stock q : stocks) {
+			if (q.getSymbol().equalsIgnoreCase(n)) {
+				 stock = q;
+			}
+		}
+		if(stock!=null){
+			stocks.remove(stock);
+			return true;
+		}
+		return false;
+	}
+	public Stock getQuote(int index) {
+		if (stocks != null && stocks.size() > index) {
+			return stocks.get(index);
 		}
 		return null;
 	}
 
-	public Quote getQuoteAsString(String quote) {
+	public Stock getQuoteAsString(String quote) {
 		if (quote == null) {
 			return null;
 		}
-		if (quotes.isEmpty()) {
+		if (stocks.isEmpty()) {
 			return null;
 		}
-		for (Quote q : quotes) {
+		for (Stock q : stocks) {
 			if (q.getSymbol().equalsIgnoreCase(quote)) {
 				return q;
 			}
@@ -66,69 +107,73 @@ public class MarketCrawler {
 		return null;
 	}
 
-	private Quote getQuote(String quote) {
-		for (Quote q : quotes) {
+	private Stock getQuote(String quote) {
+		for (Stock q : stocks) {
 			if (q.getSymbol().equalsIgnoreCase(quote)) {
 				return q;
 			}
 		}
-		Quote q = new Quote(quote);
-		quotes.add(q);
+		Stock q = new Stock(quote);
+		stocks.add(q);
 		return q;
 	}
 
 	public void crawlForQuoteData() {
-		if (quotes.isEmpty()) {
+		if (stocks.isEmpty()) {
 			Main.output("Läs in historisk data först!");
 		} else {
 			JSONObject obj;
 			try {
-				Main.output("Fråga:\n" + urlForQuoteData);
+				Main.output("Fråga:\n" + urlForStockData);
 				Main.output("Läser in data, vänligen vänta");
-				obj = new JSONObject(IOUtils.toString(new URL(urlForQuoteData), Charset.forName("UTF-8")));
+				obj = new JSONObject(IOUtils.toString(new URL(urlForStockData), Charset.forName("UTF-8")));
 				JSONObject q = obj.getJSONObject("query");
 				if (!q.isNull("results")) {
 					JSONObject results = q.getJSONObject("results");
 					JSONArray quote = results.getJSONArray("quote");
 					for (Object d : quote) {
 						JSONObject jsonLineItem = (JSONObject) d;
-						String symbol = getString("Symbol",jsonLineItem);
-						double averageDailyVolume = getDouble("AverageDailyVolume",jsonLineItem);
-						double bookValue = getDouble("BookValue",jsonLineItem);
-						String currency = getString("Currency",jsonLineItem);
-						String lastTradeDate = getString("LastTradeDate",jsonLineItem);
-						double earningsShare = getDouble("EarningsShare",jsonLineItem);
-						double ePSEstimateCurrentYear = getDouble("EPSEstimateCurrentYear",jsonLineItem);
-						double ePSEstimateNextYear = getDouble("EPSEstimateNextYear",jsonLineItem);
-						double ePSEstimateNextQuarter = getDouble("EPSEstimateNextQuarter",jsonLineItem);
-						double yearLow = getDouble("YearLow",jsonLineItem);
-						double yearHigh = getDouble("YearHigh",jsonLineItem);
-						String marketCapitalization = getString("MarketCapitalization",jsonLineItem);
-						String ebitda = getString("EBITDA",jsonLineItem);
-						double changeFromYearLow = getDouble("ChangeFromYearLow",jsonLineItem);
-						String percentChangeFromYearLow = getString("PercentChangeFromYearLow",jsonLineItem);
-						double changeFromYearHigh = getDouble("ChangeFromYearHigh",jsonLineItem);
-						String percebtChangeFromYearHigh =getString("PercebtChangeFromYearHigh",jsonLineItem);
-						double fiftydayMovingAverage =  getDouble("FiftydayMovingAverage",jsonLineItem);
-						double twoHundreddayMovingAverage = getDouble("TwoHundreddayMovingAverage",jsonLineItem);
-						double changeFromTwoHundreddayMovingAverage = getDouble("ChangeFromTwoHundreddayMovingAverage",jsonLineItem);
-						String percentChangeFromTwoHundreddayMovingAverage = getString("PercentChangeFromTwoHundreddayMovingAverage",jsonLineItem);
-						double changeFromFiftydayMovingAverage = getDouble("ChangeFromFiftydayMovingAverage",jsonLineItem);
-						String percentChangeFromFiftydayMovingAverage = getString("PercentChangeFromFiftydayMovingAverage",jsonLineItem);
-						String name = getString("Name",jsonLineItem);
-						double priceSales = getDouble("PriceSales",jsonLineItem);
-						double priceBook = getDouble("PriceBook",jsonLineItem);
-						String exDividendDate =getString("ExDividendDate",jsonLineItem);
-						double pegRatio = getDouble("PEGRatio",jsonLineItem);
-						double peRatio = getDouble("PERatio",jsonLineItem);
-						double volume = getDouble("Volume",jsonLineItem);
-						String yearRange = getString("YearRange",jsonLineItem);
-						String stockExchange = getString("StockExchange",jsonLineItem);
-						String percentChange = getString("PercentChange",jsonLineItem);
+						String symbol = getString("Symbol", jsonLineItem);
+						double averageDailyVolume = getDouble("AverageDailyVolume", jsonLineItem);
+						double bookValue = getDouble("BookValue", jsonLineItem);
+						String currency = getString("Currency", jsonLineItem);
+						String lastTradeDate = getString("LastTradeDate", jsonLineItem);
+						double earningsShare = getDouble("EarningsShare", jsonLineItem);
+						double ePSEstimateCurrentYear = getDouble("EPSEstimateCurrentYear", jsonLineItem);
+						double ePSEstimateNextYear = getDouble("EPSEstimateNextYear", jsonLineItem);
+						double ePSEstimateNextQuarter = getDouble("EPSEstimateNextQuarter", jsonLineItem);
+						double yearLow = getDouble("YearLow", jsonLineItem);
+						double yearHigh = getDouble("YearHigh", jsonLineItem);
+						String marketCapitalization = getString("MarketCapitalization", jsonLineItem);
+						String ebitda = getString("EBITDA", jsonLineItem);
+						double changeFromYearLow = getDouble("ChangeFromYearLow", jsonLineItem);
+						String percentChangeFromYearLow = getString("PercentChangeFromYearLow", jsonLineItem);
+						double changeFromYearHigh = getDouble("ChangeFromYearHigh", jsonLineItem);
+						String percebtChangeFromYearHigh = getString("PercebtChangeFromYearHigh", jsonLineItem);
+						double fiftydayMovingAverage = getDouble("FiftydayMovingAverage", jsonLineItem);
+						double twoHundreddayMovingAverage = getDouble("TwoHundreddayMovingAverage", jsonLineItem);
+						double changeFromTwoHundreddayMovingAverage = getDouble("ChangeFromTwoHundreddayMovingAverage",
+								jsonLineItem);
+						String percentChangeFromTwoHundreddayMovingAverage = getString(
+								"PercentChangeFromTwoHundreddayMovingAverage", jsonLineItem);
+						double changeFromFiftydayMovingAverage = getDouble("ChangeFromFiftydayMovingAverage",
+								jsonLineItem);
+						String percentChangeFromFiftydayMovingAverage = getString(
+								"PercentChangeFromFiftydayMovingAverage", jsonLineItem);
+						String name = getString("Name", jsonLineItem);
+						double priceSales = getDouble("PriceSales", jsonLineItem);
+						double priceBook = getDouble("PriceBook", jsonLineItem);
+						String exDividendDate = getString("ExDividendDate", jsonLineItem);
+						double pegRatio = getDouble("PEGRatio", jsonLineItem);
+						double peRatio = getDouble("PERatio", jsonLineItem);
+						double volume = getDouble("Volume", jsonLineItem);
+						String yearRange = getString("YearRange", jsonLineItem);
+						String stockExchange = getString("StockExchange", jsonLineItem);
+						String percentChange = getString("PercentChange", jsonLineItem);
 						// get quote, do not create a new one if not found!
-						Quote actualQuote = getQuoteAsString(symbol);
+						Stock actualQuote = getQuoteAsString(symbol);
 						if (actualQuote != null) {
-							QuoteData quoteData = new QuoteData(averageDailyVolume, bookValue, currency, lastTradeDate,
+							StockData quoteData = new StockData(averageDailyVolume, bookValue, currency, lastTradeDate,
 									earningsShare, ePSEstimateCurrentYear, ePSEstimateNextQuarter, ePSEstimateNextYear,
 									yearLow, yearHigh, marketCapitalization, ebitda, changeFromYearLow,
 									percentChangeFromYearLow, changeFromYearHigh, percebtChangeFromYearHigh,
@@ -139,7 +184,7 @@ public class MarketCrawler {
 									stockExchange, percentChange);
 							actualQuote.addQuoteData(quoteData);
 						} else {
-							Main.output("Hittade inte aktien");
+							Main.output("Fel vid inläsning av data för aktien: " + symbol);
 						}
 					}
 					Main.output("Data inläst!");
@@ -157,14 +202,14 @@ public class MarketCrawler {
 	}
 
 	private String getString(String string, JSONObject jsonLineItem) {
-		if(jsonLineItem.has(string) && !jsonLineItem.isNull(string)){
+		if (jsonLineItem.has(string) && !jsonLineItem.isNull(string)) {
 			return jsonLineItem.getString(string);
 		}
 		return null;
 	}
-	
+
 	private double getDouble(String string, JSONObject jsonLineItem) {
-		if(jsonLineItem.has(string) && !jsonLineItem.isNull(string)){
+		if (jsonLineItem.has(string) && !jsonLineItem.isNull(string)) {
 			return jsonLineItem.getDouble(string);
 		}
 		return 0;
@@ -188,14 +233,14 @@ public class MarketCrawler {
 						Date date = getDateFromString(dateString);
 						if (date != null) {
 							double volume = getDouble("Volume", jsonLineItem);
-							double open =  getDouble("Open", jsonLineItem);
+							double open = getDouble("Open", jsonLineItem);
 							double close = getDouble("Close", jsonLineItem);
 							double adjClose = getDouble("Adj_Close", jsonLineItem);
 							double low = getDouble("Low", jsonLineItem);
 							double high = getDouble("High", jsonLineItem);
 							// TODO check for invalid date
-							Quote quote = getQuote(symbol);
-							QuoteDay qd = new QuoteDay(date, adjClose, close, high, low, open, volume);
+							Stock quote = getQuote(symbol);
+							StockDayValue qd = new StockDayValue(date, adjClose, close, high, low, open, volume);
 							quote.addQouteDay(qd);
 						}
 					}
@@ -221,7 +266,7 @@ public class MarketCrawler {
 	@Override
 	public String toString() {
 		String s = "RESULTS\n";
-		for (Quote q : quotes) {
+		for (Stock q : stocks) {
 			s += q.toString();
 		}
 		return s;
@@ -239,7 +284,7 @@ public class MarketCrawler {
 
 	}
 
-	private static String getStringForCompanies(ArrayList<String> companies2) {
+	private static String getStringForCompanies(ObservableList<String> companies2) {
 		String ret = "";
 		for (int i = 0; i < companies2.size(); i++) {
 			ret += "%22" + companies2.get(i) + "%22,";
@@ -273,7 +318,7 @@ public class MarketCrawler {
 		urlForHistoricalData = URL.replace("FRÅGA", queryForHistoricalData);
 	}
 
-	public ArrayList<String> getCompanies() {
+	public ObservableList<String> getCompanies() {
 		return companies;
 	}
 
@@ -289,7 +334,13 @@ public class MarketCrawler {
 			OutputStream file = new FileOutputStream("marketdata.ser");
 			OutputStream buffer = new BufferedOutputStream(file);
 			ObjectOutput output = new ObjectOutputStream(buffer);
-			output.writeObject(quotes);
+			//copy list
+			ArrayList<String> companiesCopy = new ArrayList<>();
+			for (String c : companies) {
+				companiesCopy.add(c);
+			}
+			output.writeObject(companiesCopy);
+			output.writeObject(stocks);
 			output.close();
 			file.close();
 			Main.output("Data sparad");
@@ -303,6 +354,29 @@ public class MarketCrawler {
 
 	}
 
+	public ArrayList<StockResultSet> searchForQuote(String quote) {
+		ArrayList<StockResultSet> res = new ArrayList<>();
+		try {
+			JSONObject obj = new JSONObject(
+					IOUtils.toString(new URL("http://d.yimg.com/aq/autoc?query=" + quote + "&region=US&lang=en-US"),
+							Charset.forName("UTF-8")));
+			JSONObject q = obj.getJSONObject("ResultSet");
+			JSONArray result = q.getJSONArray("Result");
+			for (Object r : result) {
+				JSONObject jsonLineItem = (JSONObject) r;
+				String name = jsonLineItem.getString("name");
+				String symbol = jsonLineItem.getString("symbol");
+				String exch = jsonLineItem.getString("exch");
+				String exchDisp = jsonLineItem.getString("exchDisp");
+				res.add(new StockResultSet(name, symbol, exch, exchDisp));
+			}
+		} catch (JSONException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return res;
+	}
+
 	@SuppressWarnings("unchecked")
 	public void open() {
 		try {
@@ -310,7 +384,9 @@ public class MarketCrawler {
 			FileInputStream file = new FileInputStream("marketdata.ser");
 			BufferedInputStream buffer = new BufferedInputStream(file);
 			ObjectInputStream input = new ObjectInputStream(buffer);
-			quotes = (ArrayList<Quote>) input.readObject();
+			ArrayList<String> list = (ArrayList<String>) input.readObject();
+			companies = FXCollections.observableArrayList(list);
+			stocks = (ArrayList<Stock>) input.readObject();
 			input.close();
 			file.close();
 			Main.output("Sparad data inläst");
@@ -328,7 +404,7 @@ public class MarketCrawler {
 
 	public void clear() {
 		Main.output("Rensar data (även sparad)");
-		quotes.clear();
+		stocks.clear();
 		File file = new File("marketdata.ser");
 		if (file.delete()) {
 			Main.output(file.getName() + " borttagen!");

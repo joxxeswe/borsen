@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import com.joxxe.borsen.Main;
+import com.joxxe.borsen.threadExecuter.NotifyingThread;
 
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -43,44 +44,23 @@ public class Tab0 extends Tab {
 	}
 
 	private void crawlForHistoricalData(Main m, DatePicker startDate, DatePicker endDate) {
-		Thread t = new Thread() {
+		NotifyingThread t = new NotifyingThread() {
+			
 			@Override
-			public void run() {
-				m.getMarketCrawler().setTimeSpanAsLocalDate(startDate.getValue(), endDate.getValue());
-				m.getMarketCrawler().crawlForHistoricalData();
-				// change tab and show data
-				Platform.runLater(new Runnable() {
-					@Override
-					public void run() {
-						m.tabbedPane.getSelectionModel().select(1);
-						crawlForData(m);
-					}
-				});
-				m.threads.remove(this);
-			}
-		};
-		m.threads.add(t);
-		t.start();
-	}
-
-	private void crawlForData(Main m) {
-		Thread t = new Thread() {
-			@Override
-			public void run() {
+			public void doRun() {
+				m.marketCrawler.setTimeSpanAsLocalDate(startDate.getValue(), endDate.getValue());
+				m.marketCrawler.crawlForHistoricalData();
 				m.marketCrawler.crawlForQuoteData();
 				// change tab and show data
 				Platform.runLater(new Runnable() {
 					@Override
 					public void run() {
-						m.tabbedPane.getSelectionModel().select(3);
+						m.tabbedPane.getSelectionModel().select(1);
 					}
-
 				});
-				m.threads.remove(this);
 			}
 		};
-		m.threads.add(t);
-		t.start();
+		m.executeRunnable(t);
 	}
 
 	private StringConverter<LocalDate> getStringConverter() {

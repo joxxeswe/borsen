@@ -3,7 +3,7 @@ package com.joxxe.borsen.gui.tabs;
 import com.joxxe.borsen.Main;
 import com.joxxe.borsen.gui.DataPane;
 import com.joxxe.borsen.model.MarketCrawler;
-import com.joxxe.borsen.model.Quote;
+import com.joxxe.borsen.model.stock.Stock;
 
 import javafx.event.EventHandler;
 import javafx.scene.chart.CategoryAxis;
@@ -46,9 +46,10 @@ public class Tab2 extends Tab {
 
 	public void update() {
 		lineChart.setTitle(list.getSelectionModel().getSelectedItem());
-		Quote s = marketCrawler.getQuoteAsString(list.getSelectionModel().getSelectedItem());
+		Stock s = marketCrawler.getQuoteAsString(list.getSelectionModel().getSelectedItem());
+		lineChart.getData().clear();
+		dataPane.clearData();
 		if (s != null) {
-			lineChart.getData().clear();
 			Series<String, Number> series = s.getDataSeries();
 			lineChart.getData().add(series);
 			for (final Data<String, Number> data : series.getData()) {

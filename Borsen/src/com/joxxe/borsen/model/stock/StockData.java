@@ -1,8 +1,8 @@
-package com.joxxe.borsen.model;
+package com.joxxe.borsen.model.stock;
 
 import java.io.Serializable;
 
-public class QuoteData implements Serializable {
+public class StockData implements Serializable {
 
 	/**
 	 * 
@@ -39,11 +39,11 @@ public class QuoteData implements Serializable {
 	private String percentChange;
 	private String stockExchange;
 
-	public QuoteData(){
+	public StockData(){
 		
 	}
 
-	public QuoteData(double averageDailyVolume, double bookValue, String currency, String lastTradeDate,
+	public StockData(double averageDailyVolume, double bookValue, String currency, String lastTradeDate,
 			double earningsShare, double ePSEstimateCurrentYear, double ePSEstimateNextQuarter,
 			double ePSEstimateNextYear, double yearLow, double yearHigh, String marketCapitalization, String ebitda,
 			double changeFromYearLow, String percentChangeFromYearLow, double changeFromYearHigh,

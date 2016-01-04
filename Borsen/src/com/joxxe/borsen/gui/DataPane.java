@@ -1,14 +1,19 @@
 package com.joxxe.borsen.gui;
 
-
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
-import com.joxxe.borsen.model.QuoteData;
+import com.joxxe.borsen.model.stock.StockData;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 
+/**
+ * Class for showing data about a stock.
+ * 
+ * @author joakim hagberg
+ *
+ */
 public class DataPane extends Pane {
 	private Label valueName;
 	private Label valuePE;
@@ -20,18 +25,25 @@ public class DataPane extends Pane {
 	private Label valueYearHigh;
 	private Label valueStockExchange;
 
+	/**
+	 * Constructor
+	 */
 	public DataPane() {
 		getChildren().add(getPane());
 	}
 
-	
-	private GridPane getPane(){
-		
+	/**
+	 * Method that creates and return the pane
+	 * 
+	 * @return The created pane.
+	 */
+	private GridPane getPane() {
+
 		GridPane pane = new GridPane();
 		pane.setVgap(5);
 		pane.setHgap(5);
 		pane.setPadding(new Insets(10, 10, 10, 10));
-		
+
 		Label lblName = new Label("Name");
 		lblName.setPrefWidth(150);
 		Label lblStockExchange = new Label("Marknad");
@@ -54,48 +66,71 @@ public class DataPane extends Pane {
 		valuePEGRatio = new Label();
 		valueYearLow = new Label();
 		valueYearHigh = new Label();
-		
-		pane.add(lblName,0,0);
-		pane.add(valueName,1,0);
-		
-		pane.add(lblStockExchange,2,0);
-		pane.add(valueStockExchange,3,0);
 
-		pane.add(lblPE,0,1);
-		pane.add(valuePE,1,1);
-		
-		pane.add(lblPEGRatio,2,1);
-		pane.add(valuePEGRatio,3,1);
-		
+		pane.add(lblName, 0, 0);
+		pane.add(valueName, 1, 0);
+
+		pane.add(lblStockExchange, 2, 0);
+		pane.add(valueStockExchange, 3, 0);
+
+		pane.add(lblPE, 0, 1);
+		pane.add(valuePE, 1, 1);
+
+		pane.add(lblPEGRatio, 2, 1);
+		pane.add(valuePEGRatio, 3, 1);
+
 		pane.add(lblEbitda, 0, 2);
 		pane.add(valueEbitda, 1, 2);
-		
+
 		pane.add(lblEarningsShare, 2, 2);
 		pane.add(valueEarningsshare, 3, 2);
-		
+
 		pane.add(lblexDividendDate, 0, 3);
-		pane.add(valueExDividendDate, 1,3);
-		
+		pane.add(valueExDividendDate, 1, 3);
+
 		pane.add(lblYearLow, 0, 4);
 		pane.add(valueYearLow, 1, 4);
-		
+
 		pane.add(lblYearHigh, 2, 4);
-		pane.add(valueYearHigh, 3,4);
-		
+		pane.add(valueYearHigh, 3, 4);
+
 		return pane;
 	}
 
-	public void updateData(QuoteData quoteData){
+	/**
+	 * Updates the data shown in the pane.
+	 * 
+	 * @param quoteData
+	 *            Data to show.
+	 */
+	public void updateData(StockData quoteData) {
+		if (quoteData != null) {
 			valueName.setText(quoteData.getName());
-			valuePE.setText(""+quoteData.getPeRatio());
-			valueEarningsshare.setText(""+ quoteData.getEarningsShare());
+			valuePE.setText("" + quoteData.getPeRatio());
+			valueEarningsshare.setText("" + quoteData.getEarningsShare());
 			valueEbitda.setText("" + quoteData.getEbitda());
 			valueExDividendDate.setText(quoteData.getExDividendDate());
 			valuePEGRatio.setText("" + quoteData.getPegRatio());
-			valueYearHigh.setText(""+ quoteData.getYearHigh());
-			valueYearLow.setText(""+ quoteData.getYearLow());
+			valueYearHigh.setText("" + quoteData.getYearHigh());
+			valueYearLow.setText("" + quoteData.getYearLow());
 			valueStockExchange.setText(quoteData.getStockExchange());
-		
+		}
+
+	}
+
+	/**
+	 * Clears the data in the pane.
+	 */
+	public void clearData() {
+		valueName.setText("");
+		valuePE.setText("");
+		valueEarningsshare.setText("");
+		valueEbitda.setText("");
+		valueExDividendDate.setText("");
+		valuePEGRatio.setText("");
+		valueYearHigh.setText("");
+		valueYearLow.setText("");
+		valueStockExchange.setText("");
 	}
 
 }

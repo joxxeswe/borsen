@@ -7,6 +7,8 @@ import com.joxxe.borsen.gui.tabs.Tab0;
 import com.joxxe.borsen.gui.tabs.Tab1;
 import com.joxxe.borsen.gui.tabs.Tab2;
 import com.joxxe.borsen.model.MarketCrawler;
+import com.joxxe.borsen.threadExecuter.NotifyingThread;
+import com.joxxe.borsen.threadExecuter.ThreadExecuter;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -26,6 +28,11 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+/**
+ * Main class for application.
+ * @author joakim hagberg
+ *
+ */
 public class Main extends Application {
 	public static final int LIST_WIDTH = 150;
 	private static TextArea output;
@@ -34,6 +41,10 @@ public class Main extends Application {
 	public static void main(String[] args) {
 		launch(args);
 	}
+	/**
+	 * Method for printing text in output field.
+	 * @param text Text to print.
+	 */
 	public static void output(String text) {
 		Platform.runLater(new Runnable() {
 
@@ -53,22 +64,23 @@ public class Main extends Application {
 
 	public TabPane tabbedPane;
 
-	public ArrayList<Thread> threads;
 	public ListView<String> list;
+	private ThreadExecuter threadExecuter;
 
+	/**
+	 * Method to be called when exiting the application.
+	 */
 	public void exit() {
-		for (Thread t : threads) {
-			t.interrupt();
-		}
+		threadExecuter.exit();
 		Platform.exit();
 		System.exit(1);
 
 	}
 
-	public MarketCrawler getMarketCrawler() {
-		return marketCrawler;
-	}
 
+	/**
+	 * Method that inits the gui.
+	 */
 	private void initGUI() {
 		MenuBorsen menuBorsen = new MenuBorsen(this);
 		VBox v = new VBox();
@@ -125,8 +137,6 @@ public class Main extends Application {
 		});
 		//
 		output = new TextArea();
-		//add all
-		//TODO menu output
 		h.getChildren().addAll(list, tabbedPane);
 		v.getChildren().addAll(menuBorsen.getMenuBar(),h,output);
 		tabbedPane.setPrefHeight(root.getHeight() - OUTPUT_HEIGHT);
@@ -135,6 +145,11 @@ public class Main extends Application {
 		root.setCenter(v);
 	}
 
+	/**
+	 * Method for init listeners when chaning window size.
+	 * @param primaryStage Primary stage
+	 * @param scene Scene 
+	 */
 	private void initListeners(Stage primaryStage, Scene scene) {
 		// new width?
 		scene.widthProperty().addListener(new ChangeListener<Number>() {
@@ -151,6 +166,7 @@ public class Main extends Application {
 				tab2.getLineChart().setPrefSize(root.getWidth() - LIST_WIDTH, root.getHeight() - OUTPUT_HEIGHT-DATA_PANE_HEIGHT);
 			}
 		});
+		//be sure exit method is used when closing app.
 		primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			public void handle(WindowEvent event) {
 				exit();
@@ -161,17 +177,9 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			threads = new ArrayList<>();
+			threadExecuter = new ThreadExecuter();
 			// init manager
-			String[] s = { "ABBN.VX", "ALFA.ST", "ATCO-A.ST", "ATCO-B.ST", "AZN.L", "BOL.ST", "ELUX-B.ST",
-					"ERIC-B.ST", "GETI-B.ST", "HM-B.ST", "INVE-B.ST", "KINV-B.ST", "LUPE.ST", "MTG-B.ST", "NDA-SEK.ST",
-					"NOKIA.HE", "SAND.ST", "SCA-B.ST", "SEB-A.ST", "SECU-B.ST", "SHB-A.ST", "SKA-B.ST", "SKF-B.ST",
-					"SSAB-A.ST", "SWED-A.ST", "SWMA.ST", "TEL2-B.ST", "TLSN.ST", "VOLV-B.ST" };
-			ArrayList<String> c = new ArrayList<String>();
-			for (int i = 0; i < s.length; i++) {
-				c.add(s[i]);
-			}
-			marketCrawler = new MarketCrawler(c);
+			marketCrawler = new MarketCrawler(FXCollections.observableArrayList(getCompanies()));
 			// init gui
 			root = new BorderPane();
 			Scene scene = new Scene(root, 800, 640);
@@ -187,8 +195,31 @@ public class Main extends Application {
 			// e.printStackTrace();
 		}
 	}
+	private ArrayList<String> getCompanies() {
+		String[] s = { "ABBN.VX", "ALFA.ST", "ATCO-A.ST", "ATCO-B.ST", "AZN.L", "BOL.ST", "ELUX-B.ST",
+				"ERIC-B.ST", "GETI-B.ST", "HM-B.ST", "INVE-B.ST", "KINV-B.ST", "LUPE.ST", "MTG-B.ST", "NDA-SEK.ST",
+				"NOKIA.HE", "SAND.ST", "SCA-B.ST", "SEB-A.ST", "SECU-B.ST", "SHB-A.ST", "SKA-B.ST", "SKF-B.ST",
+				"SSAB-A.ST", "SWED-A.ST", "SWMA.ST", "TEL2-B.ST", "TLSN.ST", "VOLV-B.ST" };
+		ArrayList<String> c = new ArrayList<String>();
+		for (int i = 0; i < s.length; i++) {
+			c.add(s[i]);
+		}
+		return c;
+	}
+	
+	/**
+	 * Clear data from marketcrawler.
+	 */
 	public void clear() {
 		marketCrawler.clear();
+	}
+	
+	/**
+	 * Method to execute another thread
+	 * @param t Thread to execute.
+	 */
+	public void executeRunnable(NotifyingThread t){
+		threadExecuter.execute(t);
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.joxxe.borsen.model;
+package com.joxxe.borsen.model.stock;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -14,25 +14,25 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 
-public class Quote implements Externalizable {
+public class Stock implements Externalizable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -4769334868506811919L;
 	private SimpleStringProperty symbol;
-	private ArrayList<QuoteDay> qouteDays = new ArrayList<QuoteDay>();
-	private QuoteData quoteData;
+	private ArrayList<StockDayValue> qouteDays = new ArrayList<StockDayValue>();
+	private StockData quoteData;
 
-	public Quote(String symbol) {
+	public Stock(String symbol) {
 		this.setSymbol(new SimpleStringProperty(symbol));
 	}
 
-	public Quote() {
+	public Stock() {
 
 	}
 
-	public Quote(SimpleStringProperty symbol) {
+	public Stock(SimpleStringProperty symbol) {
 		this.setSymbol(symbol);
 	}
 
@@ -44,9 +44,9 @@ public class Quote implements Externalizable {
 		this.symbol = symbol;
 	}
 
-	public boolean addQouteDay(QuoteDay q) {
+	public boolean addQouteDay(StockDayValue q) {
 		// check so no day is added two times.
-		for (QuoteDay quoteDay : qouteDays) {
+		for (StockDayValue quoteDay : qouteDays) {
 			if (quoteDay.equals(q)) {
 				return false;
 			}
@@ -61,7 +61,7 @@ public class Quote implements Externalizable {
 		// reverse list
 		for (int i = qouteDays.size() - 1; i > 0; i--) {
 			SimpleDateFormat f = new SimpleDateFormat("yy-MM-dd");
-			QuoteDay q = qouteDays.get(i);
+			StockDayValue q = qouteDays.get(i);
 			String date = f.format(q.getDateAsDate());
 			Data<String, Number> d = new XYChart.Data<>(date, q.getClose());
 			d.setNode(new HoveredThresholdNode(q.getClose()));
@@ -70,7 +70,7 @@ public class Quote implements Externalizable {
 		return series;
 	}
 
-	public ArrayList<QuoteDay> getQuoteDays() {
+	public ArrayList<StockDayValue> getQuoteDays() {
 		return qouteDays;
 	}
 
@@ -90,15 +90,15 @@ public class Quote implements Externalizable {
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		setSymbol(new SimpleStringProperty((String) in.readObject()));
-		quoteData = (QuoteData) in.readObject();
-		qouteDays = (ArrayList<QuoteDay>) in.readObject();
+		quoteData = (StockData) in.readObject();
+		qouteDays = (ArrayList<StockDayValue>) in.readObject();
 
 	}
 
-	public QuoteData getQuoteData(){
+	public StockData getQuoteData(){
 		return quoteData;
 	}
-	public void addQuoteData(QuoteData quoteData) {
+	public void addQuoteData(StockData quoteData) {
 		this.quoteData = quoteData;
 	}
 

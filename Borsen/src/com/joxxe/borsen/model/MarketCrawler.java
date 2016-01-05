@@ -370,8 +370,10 @@ public class MarketCrawler {
 				String exchDisp = jsonLineItem.getString("exchDisp");
 				res.add(new StockResultSet(name, symbol, exch, exchDisp));
 			}
-		} catch (JSONException | IOException e) {
-			// TODO Auto-generated catch block
+		} catch (IOException e) {
+			e.printStackTrace();
+			Main.output("Anslutningsfel:" + e.getMessage());
+		} catch (JSONException e){
 			e.printStackTrace();
 		}
 		return res;

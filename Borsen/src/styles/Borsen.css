@@ -1,0 +1,9 @@
+.output .content{
+	-fx-background-color: rgb(101,127,146,0.5);
+	-fx-text-fill: #ffffff;
+
+}
+.datapane{
+	-fx-background-color: rgb(101,127,146);
+	-fx-text-fill: #ffffff;
+}

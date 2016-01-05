@@ -40,6 +40,7 @@ public class DataPane extends Pane {
 	private GridPane getPane() {
 
 		GridPane pane = new GridPane();
+		getStyleClass().add("datapane");
 		pane.setVgap(5);
 		pane.setHgap(5);
 		pane.setPadding(new Insets(10, 10, 10, 10));

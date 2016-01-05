@@ -137,6 +137,7 @@ public class Main extends Application {
 		});
 		//
 		output = new TextArea();
+		output.getStyleClass().add("output");
 		h.getChildren().addAll(list, tabbedPane);
 		v.getChildren().addAll(menuBorsen.getMenuBar(),h,output);
 		tabbedPane.setPrefHeight(root.getHeight() - OUTPUT_HEIGHT);
@@ -183,7 +184,7 @@ public class Main extends Application {
 			// init gui
 			root = new BorderPane();
 			Scene scene = new Scene(root, 800, 640);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			scene.getStylesheets().add(getClass().getResource("/styles/Borsen.css").toExternalForm());
 			initGUI();
 			primaryStage.getIcons().add(new Image(getClass().getResourceAsStream("/images/borsen.png")));
 			// redirectOutput();

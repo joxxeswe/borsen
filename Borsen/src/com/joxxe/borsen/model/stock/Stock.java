@@ -4,15 +4,10 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-import com.joxxe.borsen.gui.HoveredThresholdNode;
+import java.util.Comparator;
 
 import javafx.beans.property.SimpleStringProperty;
-import javafx.scene.chart.XYChart;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
 
 public class Stock implements Externalizable {
 
@@ -54,20 +49,30 @@ public class Stock implements Externalizable {
 		qouteDays.add(q);
 		return true;
 	}
+	
+	public void sortQuoteDays(boolean acending){
+		qouteDays.sort(new Comparator<StockDayValue>() {
 
-	public Series<String, Number> getDataSeries() {
-		Series<String, Number> series = new Series<String, Number>();
-		series.setName(getSymbol());
-		// reverse list
-		for (int i = qouteDays.size() - 1; i > 0; i--) {
-			SimpleDateFormat f = new SimpleDateFormat("yy-MM-dd");
-			StockDayValue q = qouteDays.get(i);
-			String date = f.format(q.getDateAsDate());
-			Data<String, Number> d = new XYChart.Data<>(date, q.getClose());
-			d.setNode(new HoveredThresholdNode(q.getClose()));
-			series.getData().add(d);
-		}
-		return series;
+			@Override
+			public int compare(StockDayValue o1, StockDayValue o2) {
+				if(o1.getDateAsDate().equals(o2.getDateAsDate())){
+					//equal
+					return 0;
+				}else if(o1.getDateAsDate().before(o2.getDateAsDate())){
+					if(acending){
+						return 1;
+					}else{
+						return -1;
+					}
+				}else{
+					if(acending){
+						return -1;
+					}else{
+						return 1;
+					}
+				}
+			}
+		});
 	}
 
 	public ArrayList<StockDayValue> getQuoteDays() {

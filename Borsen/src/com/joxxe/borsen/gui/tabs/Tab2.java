@@ -2,23 +2,17 @@ package com.joxxe.borsen.gui.tabs;
 
 import com.joxxe.borsen.Main;
 import com.joxxe.borsen.gui.DataPane;
+import com.joxxe.borsen.gui.candlechart.CandleStickChart;
+import com.joxxe.borsen.gui.candlechart.DecimalAxisFormatter;
 import com.joxxe.borsen.model.MarketCrawler;
 import com.joxxe.borsen.model.stock.Stock;
-
-import javafx.event.EventHandler;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart.Data;
-import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Tab;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 public class Tab2 extends Tab {
 
-	private LineChart<String, Number> lineChart;
+	private CandleStickChart chart;
 	private MarketCrawler marketCrawler;
 	private ListView<String> list;
 	private DataPane dataPane;
@@ -30,44 +24,32 @@ public class Tab2 extends Tab {
 		setText("Diagram");
 		VBox box2 = new VBox();
 		dataPane = new DataPane();
-		CategoryAxis xAxis = new CategoryAxis();
-		NumberAxis yAxis = new NumberAxis();
-		yAxis.setLabel("Värde");
-		xAxis.setLabel("Datum");
 		// creating the chart
-		lineChart = new LineChart<String, Number>(xAxis, yAxis);
-		lineChart.setPrefSize(m.root.getWidth() - Main.LIST_WIDTH, m.root.getHeight() - Main.OUTPUT_HEIGHT-Main.DATA_PANE_HEIGHT);
-		lineChart.setCreateSymbols(false);
+		String title = list.getSelectionModel().getSelectedItem();
+		chart = new CandleStickChart(title);
+		chart.setYAxisFormatter(new DecimalAxisFormatter("#000.00"));
+		chart.setPrefSize(m.root.getWidth() - Main.LIST_WIDTH, m.root.getHeight() - Main.OUTPUT_HEIGHT-Main.DATA_PANE_HEIGHT);
 		dataPane.setPrefHeight(Main.DATA_PANE_HEIGHT);
-		box2.getChildren().addAll(lineChart,dataPane);
-		update();
+		box2.getChildren().addAll(chart,dataPane);
+		//update();
 		setContent(box2);
 	}
 
 	public void update() {
-		lineChart.setTitle(list.getSelectionModel().getSelectedItem());
 		Stock s = marketCrawler.getQuoteAsString(list.getSelectionModel().getSelectedItem());
-		lineChart.getData().clear();
 		dataPane.clearData();
 		if (s != null) {
-			Series<String, Number> series = s.getDataSeries();
-			lineChart.getData().add(series);
-			for (final Data<String, Number> data : series.getData()) {
-				data.getNode().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent event) {
-						Main.output("Datum " + data.getXValue() + " värde " + data.getYValue());
-					}
-				});
-			}
+			Main.output("Visa diagram för " + s.getSymbol());
+			s.sortQuoteDays(false);
+			chart.setData(s.getQuoteDays());
 			dataPane.updateData(s.getQuoteData());
 		}
 
 	}
 	
 
-	public LineChart<String, Number> getLineChart() {
-		return lineChart;
+	public CandleStickChart getLineChart() {
+		return chart;
 	}
 
 }

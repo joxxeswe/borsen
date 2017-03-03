@@ -20,13 +20,11 @@ public class StockDayValue implements Externalizable {
 	private SimpleDoubleProperty volume;
 	private SimpleDoubleProperty open;
 	private SimpleDoubleProperty close;
-	private SimpleDoubleProperty adjClose;
 	private SimpleDoubleProperty low;
 	private SimpleDoubleProperty high;
 	
-	public StockDayValue(Date date,SimpleDoubleProperty adjClose,SimpleDoubleProperty close, SimpleDoubleProperty high,SimpleDoubleProperty low,SimpleDoubleProperty open,SimpleDoubleProperty volume){
+	public StockDayValue(Date date,SimpleDoubleProperty close, SimpleDoubleProperty high,SimpleDoubleProperty low,SimpleDoubleProperty open,SimpleDoubleProperty volume){
 		setDate(date);
-		setAdjClose(adjClose);
 		setClose(close);
 		setHigh(high);
 		setLow(low);
@@ -40,15 +38,22 @@ public class StockDayValue implements Externalizable {
 
    
 	
-	public StockDayValue(Date date2, double adjClose2, double close2, double high2, double low2, double open2,
-			double volume2) {
-		setDate(date2);
-		setAdjClose(new SimpleDoubleProperty(adjClose2));
-		setClose(new SimpleDoubleProperty(close2));
-		setHigh(new SimpleDoubleProperty(high2));
-		setLow(new SimpleDoubleProperty(low2));
-		setOpen(new SimpleDoubleProperty(open2));
-		setVolume(new SimpleDoubleProperty(volume2));
+	public StockDayValue(Date date, double close, double high, double low, double open,
+			double volume) {
+		setDate(date);
+		setClose(new SimpleDoubleProperty(close));
+		setHigh(new SimpleDoubleProperty(high));
+		setLow(new SimpleDoubleProperty(low));
+		setOpen(new SimpleDoubleProperty(open));
+		setVolume(new SimpleDoubleProperty(volume));
+	}
+
+	public StockDayValue(Date date, double close, double high, double low, double open) {
+		setDate(date);
+		setClose(new SimpleDoubleProperty(close));
+		setHigh(new SimpleDoubleProperty(high));
+		setLow(new SimpleDoubleProperty(low));
+		setOpen(new SimpleDoubleProperty(open));
 	}
 
 	@Override
@@ -57,10 +62,6 @@ public class StockDayValue implements Externalizable {
 			return ((StockDayValue)obj).getDate().equals(this.getDate());
 		}
 		return false;
-	}
-
-	public double getAdjClose() {
-		return adjClose.get();
 	}
 
 	public double getClose() {
@@ -92,10 +93,6 @@ public class StockDayValue implements Externalizable {
 		return volume.get();
 	}
 
-	public void setAdjClose(SimpleDoubleProperty adjClose) {
-		this.adjClose = adjClose;
-	}
-
 	public void setClose(SimpleDoubleProperty close) {
 		this.close = close;
 	}
@@ -125,8 +122,7 @@ public class StockDayValue implements Externalizable {
 	@Override
 	public String toString() {
 		SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-		return "--> date=" + f.format(date.get()) + ", volume=" + volume + ", open=" + open + ", close=" + close + ", adjClose="
-				+ adjClose + ", low=" + low + ", high=" + high + " \n";
+		return "--> date=" + f.format(date.get()) + ", volume=" + volume + ", open=" + open + ", close=" + close + ", low=" + low + ", high=" + high + " \n";
 	}
 
 
@@ -135,23 +131,23 @@ public class StockDayValue implements Externalizable {
 	 @Override
 	    public void writeExternal(ObjectOutput out) throws IOException {
 	        out.writeObject(getDateAsDate());
-	        out.writeDouble(getVolume());
+	        
 	        out.writeDouble(getOpen());
 	        out.writeDouble(getClose());
-	        out.writeDouble(getAdjClose());
 	        out.writeDouble(getLow());
 	        out.writeDouble(getHigh());
+	        out.writeDouble(getVolume());
 	    }
 
 	    @Override
 	    public void readExternal(ObjectInput in) throws IOException,
 	            ClassNotFoundException {
 	        setDate((Date)in.readObject());
-	        setVolume(new SimpleDoubleProperty(in.readDouble()));
+	        
 	        setOpen(new SimpleDoubleProperty(in.readDouble()));
 	        setClose(new SimpleDoubleProperty(in.readDouble()));
-	        setAdjClose(new SimpleDoubleProperty(in.readDouble()));
 	        setLow(new SimpleDoubleProperty(in.readDouble()));
 	        setHigh(new SimpleDoubleProperty(in.readDouble()));
+	        setVolume(new SimpleDoubleProperty(in.readDouble())); //TODO opptional
 	    }
 }

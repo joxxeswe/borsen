@@ -240,7 +240,7 @@ public class MarketCrawler {
 							double high = getDouble("High", jsonLineItem);
 							// TODO check for invalid date
 							Stock quote = getQuote(symbol);
-							StockDayValue qd = new StockDayValue(date, adjClose, close, high, low, open, volume);
+							StockDayValue qd = new StockDayValue(date, close, high, low, open, volume);
 							quote.addQouteDay(qd);
 						}
 					}
